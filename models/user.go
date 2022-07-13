@@ -40,7 +40,9 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	validName := u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
 
 	if !validId || !validName {
-
+		msg := "invalid request fields"
+		http.Error(w, msg, http.StatusNotAcceptable)
+		return
 	}
 
 	jsonData, err := json.Marshal(u)

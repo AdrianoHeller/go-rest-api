@@ -57,9 +57,7 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_, e := w.Write(jsonData)
-
-	if e != nil {
+	if _, e := w.Write(jsonData); e != nil {
 		msg := "could not write bytes into response"
 		http.Error(w, msg, http.StatusInternalServerError)
 		return

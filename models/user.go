@@ -12,6 +12,9 @@ type User struct {
 }
 
 func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
 	if !strings.Contains(r.Header.Get("Authorization"), "Bearer ") {
 		msg := "you must provide a token"
 		http.Error(w, msg, http.StatusUnauthorized)
@@ -26,20 +29,20 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var u User
 
-	//r.Body = http.MaxBytesReader(1000000)
+	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
+
 	err := json.NewDecoder(r.Body).Decode(&u)
 
 	if err != nil {
-		msg := "could not parse incoming payload"
-		http.Error(w, msg, http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	validId := u.Id != "" && len(u.Id) > 0 && len(u.Id) <= 25
+	validId := u.Id != "" && len(u.Id) > 0 && len(u.Id) < 25
 
 	validName := u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
 
-	if !validId || !validName {
+	if !validId && !validName {
 		msg := "invalid request fields"
 		http.Error(w, msg, http.StatusNotAcceptable)
 		return

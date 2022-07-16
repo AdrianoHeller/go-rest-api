@@ -2,13 +2,15 @@ package models
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
+	"reflect"
 	"strings"
 )
 
 type User struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }
 
 func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -38,9 +40,9 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validId := u.Id != "" && len(u.Id) > 0 && len(u.Id) < 25
+	validId := reflect.TypeOf(u.Id) != nil
 
-	validName := u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
+	validName := reflect.TypeOf(u.Name) != nil || u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
 
 	if !validId && !validName {
 		msg := "invalid request fields"

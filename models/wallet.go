@@ -27,7 +27,7 @@ type Transaction struct {
 }
 
 type Wallet struct {
-	Id           string        `json:"id"`
+	Id           uuid.UUID     `json:"id"`
 	Owner        string        `json:"owner"`
 	CreatedAt    time.Time     `json:"created_at"`
 	Transactions []Transaction `json:"transactions"`

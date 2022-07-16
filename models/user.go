@@ -43,7 +43,7 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	validId := reflect.TypeOf(u.Id) != nil
 
-	validName := strconv.Itoa(int(reflect.ValueOf(u.Name).Kind())) != "string" || u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
+	validName := strconv.Itoa(int(reflect.ValueOf(u.Name).Kind())) == "string" && u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
 
 	if !validId && !validName {
 		msg := "invalid request fields"

@@ -69,6 +69,6 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 var UserRef = &User{
-	Id:   "",
+	Id:   uuid.New(),
 	Name: "",
 }

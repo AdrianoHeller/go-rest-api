@@ -62,3 +62,10 @@ func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 	}
 }
+
+var WalletRef = &Wallet{
+	Id:           uuid.New(),
+	Owner:        "",
+	CreatedAt:    time.Now(),
+	Transactions: []Transaction{},
+}

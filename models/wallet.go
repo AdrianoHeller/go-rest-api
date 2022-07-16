@@ -4,10 +4,8 @@ import (
 	"api/helpers"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/google/uuid"
+	"net/http"
 )
 
 type TransStatus int
@@ -29,7 +27,7 @@ type Transaction struct {
 type Wallet struct {
 	Id           uuid.UUID     `json:"id"`
 	Owner        string        `json:"owner"`
-	CreatedAt    time.Time     `json:"created_at"`
+	CreatedAt    int           `json:"created_at"`
 	Transactions []Transaction `json:"transactions"`
 }
 
@@ -52,7 +50,7 @@ func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := helpers.ConvertToJson(r.Body)
+	data, err := helpers.ConvertToJson(wlt)
 
 	w.WriteHeader(http.StatusOK)
 
@@ -63,9 +61,11 @@ func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var Tr []Transaction
+
 var WalletRef = &Wallet{
 	Id:           uuid.New(),
 	Owner:        "",
-	CreatedAt:    time.Now(),
-	Transactions: []Transaction{},
+	CreatedAt:    000000000000,
+	Transactions: Tr,
 }

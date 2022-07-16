@@ -1,0 +1,30 @@
+version: "3.3"
+
+secrets:
+  psql_user:
+    external: true
+  psql_pass:
+    external: true
+
+services:
+  pgsql:
+    secrets:
+      - psql_user
+      - psql_pass
+    build:
+      context: .
+      args:
+        PORT: 5432
+        PG_DATA_LOCATION: /var/lib/postgresql/data/pgdata
+        PG_PASS_FILE: /run/secrets/psql_pass
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/psql_user
+      POSTGRES_DB: test
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+volumes:
+  pgdata:
+    driver: local

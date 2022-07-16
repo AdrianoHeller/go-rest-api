@@ -1,11 +1,11 @@
 package models
 
 import (
+	"api/helpers"
 	"encoding/json"
 	"github.com/google/uuid"
 	"net/http"
 	"reflect"
-	"strconv"
 	"strings"
 )
 
@@ -34,24 +34,28 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
 
-	err := json.NewDecoder(r.Body).Decode(&u)
+	dec := json.NewDecoder(r.Body)
+
+	dec.DisallowUnknownFields()
+
+	err := dec.Decode(&u)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		helpers.HandleCustomErrors(w, err)
 		return
 	}
 
 	validId := reflect.TypeOf(u.Id) != nil
 
-	validName := strconv.Itoa(int(reflect.ValueOf(u.Name).Kind())) == "string" && u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
+	validName := u.Name != "" && strings.Contains(u.Name, " ") && len(u.Name) < 50
 
-	if !validId && !validName {
+	if !validId || !validName {
 		msg := "invalid request fields"
 		http.Error(w, msg, http.StatusNotAcceptable)
 		return
 	}
 
-	jsonData, err := json.Marshal(u)
+	jsonData, err := helpers.ConvertToJson(u)
 
 	if err != nil {
 		msg := "could not parse incoming payload"

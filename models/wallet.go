@@ -55,11 +55,11 @@ func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	data, err := helpers.ConvertToJson(r.Body)
 
 	w.WriteHeader(http.StatusOK)
-	_, e := w.Write(data)
 
-	if e != nil {
+	if _, e := w.Write(data); e != nil {
 		msg := fmt.Sprintf("Error found: %s", e)
 		http.Error(w, msg, http.StatusInternalServerError)
+		return
 	}
 }
 

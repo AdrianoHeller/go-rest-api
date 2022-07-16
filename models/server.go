@@ -23,6 +23,7 @@ func (s *Server) ServerRoute(mux *http.ServeMux) {
 
 	mux.Handle("/", PingRef)
 	mux.Handle("/users/all", UserRef)
+	mux.Handle("/users/wallet", WalletRef)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", s.Port), mux)
 	if err != nil {

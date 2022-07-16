@@ -22,7 +22,7 @@ type Transaction struct {
 	Id     uuid.UUID   `json:"id"`
 	From   string      `json:"from"`
 	To     string      `json:"to"`
-	Amount int         `json:"amount"`
+	Amount float64     `json:"amount"`
 	Status TransStatus `json:"st"`
 }
 

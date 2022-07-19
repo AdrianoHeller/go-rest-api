@@ -2,6 +2,9 @@ package main
 
 import (
 	"api/models"
+	"context"
+	"fmt"
+	"github.com/jackc/pgx/v4"
 	"net/http"
 	"os"
 	"strings"
@@ -9,18 +12,30 @@ import (
 
 func main() {
 
-	//ctx := context.Background()
+	ctx := context.Background()
+
+	postgresConnectionString := os.Getenv("PSQL_CONN")
 
 	Port := os.Getenv("SERVER_PORT")
 
-	postrgesConnectionString := os.Getenv("PSQL_CONN")
+	if !strings.Contains(postgresConnectionString, "postgresql://") {
+		panic("you must provide a connection string")
+	}
+
+	conn, err := pgx.Connect(ctx, postgresConnectionString)
+
+	if err != nil {
+		fmt.Printf("Error found while connecting: %s", err.Error())
+		os.Exit(1)
+	}
+
+	if err := conn.Close(ctx); err != nil {
+		fmt.Printf("Error found while cclosing connection: %s", err.Error())
+		os.Exit(1)
+	}
 
 	if Port == "" {
 		Port = "5000"
-	}
-
-	if !strings.Contains(postrgesConnectionString, "postgresql://") {
-		panic("you must provide a connection string")
 	}
 
 	mux := http.NewServeMux()

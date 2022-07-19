@@ -3,15 +3,14 @@ package models
 import (
 	"api/helpers"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"reflect"
 	"strings"
 )
 
 type User struct {
-	Id   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
+	Id   string `json:"id"`
+	Name string `json:"name"`
 }
 
 func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +72,6 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 var UserRef = &User{
-	Id:   uuid.New(),
+	Id:   "",
 	Name: "",
 }

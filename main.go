@@ -4,14 +4,15 @@ import (
 	"api/models"
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
+	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
 )
 
-var conn *pgx.Conn
+//var conn *pgx.Conn
 
 func main() {
 
@@ -34,7 +35,24 @@ func main() {
 
 	fmt.Println("Connected to Postgres")
 
-	if err := listUsers(); err != nil {
+	guid, err := uuidGenerator()
+
+	if err != nil {
+		fmt.Printf("Error found while creating uuid: %s", err.Error())
+		os.Exit(1)
+	}
+
+	newUser := models.User{
+		Id:   guid,
+		Name: "John Dog",
+	}
+
+	if err := insertUser(conn, &newUser, "users"); err != nil {
+		fmt.Printf("Error while listing users: %s", err.Error())
+		os.Exit(1)
+	}
+
+	if err := listUsers(conn); err != nil {
 		fmt.Printf("Error while listing users: %s", err.Error())
 		os.Exit(1)
 	}
@@ -55,26 +73,39 @@ func main() {
 	server.ServerRoute(mux)
 }
 
-func listUsers() error {
+func listUsers(conn *pgx.Conn) error {
 	selectQuery := "select * from users"
 	rows, _ := conn.Query(context.Background(), selectQuery)
 	for rows.Next() {
-		var id uuid.UUID
+		var id string
 		var name string
 		err := rows.Scan(&id, &name)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("id: %d, name: %s", id, name)
+		fmt.Printf("id: %s, name: %s", id, name)
 	}
 	return rows.Err()
 }
 
-func insertUser(userData *models.User, tableName string) error {
-	formattedQuery := fmt.Sprintf(`insert into %s ("id","name") values("%d","%s")`, tableName, userData.Id, userData.Name)
+func insertUser(conn *pgx.Conn, userData *models.User, tableName string) error {
+
+	formattedQuery := fmt.Sprintf("insert into %s (id,name)values('%s','%s')", tableName, userData.Id, userData.Name)
 	_, err := conn.Exec(context.Background(), formattedQuery)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func uuidGenerator() (string, error) {
+	bytes := make([]byte, 16)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		log.Fatal(err)
+		return "", err
+	}
+	customUuid := fmt.Sprintf("%x-%x-%x-%x-%x",
+		bytes[0:4], bytes[4:6], bytes[6:8], bytes[8:10], bytes[10:])
+	return customUuid, nil
 }

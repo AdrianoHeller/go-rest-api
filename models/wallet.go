@@ -61,11 +61,19 @@ func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var transactionTest Transaction = Transaction{
+	Id:     uuid.New(),
+	From:   "John Bonhan",
+	To:     "Robert Plant",
+	Amount: 298.72,
+	Status: Processed,
+}
+
 var Tr []Transaction
 
 var WalletRef = &Wallet{
 	Id:           uuid.New(),
 	Owner:        "",
 	CreatedAt:    000000000000,
-	Transactions: Tr,
+	Transactions: append(Tr, transactionTest),
 }

@@ -2,17 +2,14 @@ package main
 
 import (
 	"api/models"
+	"api/services"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v4"
-	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"strings"
 )
-
-//var conn *pgx.Conn
 
 func main() {
 
@@ -35,7 +32,7 @@ func main() {
 
 	fmt.Println("Connected to Postgres")
 
-	guid, err := uuidGenerator()
+	guid, err := services.UuidGenerator()
 
 	if err != nil {
 		fmt.Printf("Error found while creating uuid: %s", err.Error())
@@ -47,12 +44,17 @@ func main() {
 		Name: "John Dog",
 	}
 
-	if err := insertUser(conn, &newUser, "users"); err != nil {
+	if err := services.InsertUser(conn, &newUser, "users"); err != nil {
 		fmt.Printf("Error while listing users: %s", err.Error())
 		os.Exit(1)
 	}
 
-	if err := listUsers(conn); err != nil {
+	if err := services.ListUsers(conn); err != nil {
+		fmt.Printf("Error while listing users: %s", err.Error())
+		os.Exit(1)
+	}
+
+	if err := services.ListSingleUser(conn, "id", "ed723ce6-6b24-aaa6-d53f-cda68b1da87e"); err != nil {
 		fmt.Printf("Error while listing users: %s", err.Error())
 		os.Exit(1)
 	}
@@ -71,41 +73,4 @@ func main() {
 	}
 
 	server.ServerRoute(mux)
-}
-
-func listUsers(conn *pgx.Conn) error {
-	selectQuery := "select * from users"
-	rows, _ := conn.Query(context.Background(), selectQuery)
-	for rows.Next() {
-		var id string
-		var name string
-		err := rows.Scan(&id, &name)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("id: %s, name: %s", id, name)
-	}
-	return rows.Err()
-}
-
-func insertUser(conn *pgx.Conn, userData *models.User, tableName string) error {
-
-	formattedQuery := fmt.Sprintf("insert into %s (id,name)values('%s','%s')", tableName, userData.Id, userData.Name)
-	_, err := conn.Exec(context.Background(), formattedQuery)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func uuidGenerator() (string, error) {
-	bytes := make([]byte, 16)
-	_, err := rand.Read(bytes)
-	if err != nil {
-		log.Fatal(err)
-		return "", err
-	}
-	customUuid := fmt.Sprintf("%x-%x-%x-%x-%x",
-		bytes[0:4], bytes[4:6], bytes[6:8], bytes[8:10], bytes[10:])
-	return customUuid, nil
 }

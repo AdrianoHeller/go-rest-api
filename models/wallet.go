@@ -4,7 +4,6 @@ import (
 	"api/helpers"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 )
 
@@ -17,7 +16,7 @@ const (
 )
 
 type Transaction struct {
-	Id     uuid.UUID   `json:"id"`
+	Id     string      `json:"id"`
 	From   string      `json:"from"`
 	To     string      `json:"to"`
 	Amount float64     `json:"amount"`
@@ -25,10 +24,9 @@ type Transaction struct {
 }
 
 type Wallet struct {
-	Id           uuid.UUID     `json:"id"`
-	Owner        string        `json:"owner"`
-	CreatedAt    int           `json:"created_at"`
-	Transactions []Transaction `json:"transactions"`
+	Id        string `json:"id"`
+	Owner     string `json:"owner"`
+	CreatedAt int    `json:"created_at"`
 }
 
 func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +60,7 @@ func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 var transactionTest Transaction = Transaction{
-	Id:     uuid.New(),
+	Id:     "",
 	From:   "John Bonhan",
 	To:     "Robert Plant",
 	Amount: 298.72,
@@ -72,8 +70,7 @@ var transactionTest Transaction = Transaction{
 var Tr []Transaction
 
 var WalletRef = &Wallet{
-	Id:           uuid.New(),
-	Owner:        "",
-	CreatedAt:    000000000000,
-	Transactions: append(Tr, transactionTest),
+	Id:        "",
+	Owner:     "",
+	CreatedAt: 000000000000,
 }

@@ -1,12 +1,12 @@
 package services
 
 import (
+	"api/helpers"
 	"api/models"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v4"
-	"log"
-	"math/rand"
 	"time"
 )
 
@@ -40,7 +40,6 @@ func ListSingleUser(conn *pgx.Conn, patternToMatch string, valueToMatch string) 
 }
 
 func InsertUser(conn *pgx.Conn, userData *models.User, tableName string) error {
-
 	formattedQuery := fmt.Sprintf("insert into %s (id,name)values('%s','%s')", tableName, userData.Id, userData.Name)
 	_, err := conn.Exec(context.Background(), formattedQuery)
 	if err != nil {
@@ -49,15 +48,30 @@ func InsertUser(conn *pgx.Conn, userData *models.User, tableName string) error {
 	return nil
 }
 
-func UuidGenerator() (string, error) {
-	rand.Seed(time.Now().UnixNano())
-	bytes := make([]byte, 16)
-	_, err := rand.Read(bytes)
+func CreateWallet(ctx *context.Context, conn *pgx.Conn, owner string) error {
+	uuid, err := helpers.UuidGenerator()
+
 	if err != nil {
-		log.Fatal(err)
-		return "", err
+		errMsg := fmt.Sprintf("Error found: %s", err)
+		return errors.New(errMsg)
 	}
-	customUuid := fmt.Sprintf("%x-%x-%x-%x-%x",
-		bytes[0:4], bytes[4:6], bytes[6:8], bytes[8:10], bytes[10:])
-	return customUuid, nil
+
+	newTransaction := models.Wallet{
+		Id:        uuid,
+		Owner:     owner,
+		CreatedAt: int(time.Now().Unix()),
+	}
+
+	insertNewQuery := fmt.Sprintf("insert into wallets (id,owner,created_at) values('%s','%s','%d')", newTransaction.Id, newTransaction.Owner, newTransaction.CreatedAt)
+
+	if _, err := conn.Exec(context.Background(), insertNewQuery); err != nil {
+		errMsg := fmt.Sprintf("Error found: %s", err)
+		return errors.New(errMsg)
+	}
+
+	return nil
+}
+
+func CreateTransaction(conn *pgx.Conn, from string, to string, amount int) error {
+
 }

@@ -99,3 +99,15 @@ func CheckValidHttpMethod(r *http.Request, acceptableMethod string) (bool, error
 		return false, errors.New("wrong method provided")
 	}
 }
+func UuidGenerator() (string, error) {
+	rand.Seed(time.Now().UnixNano())
+	bytes := make([]byte, 16)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		log.Fatal(err)
+		return "", err
+	}
+	customUuid := fmt.Sprintf("%x-%x-%x-%x-%x",
+		bytes[0:4], bytes[4:6], bytes[6:8], bytes[8:10], bytes[10:])
+	return customUuid, nil
+}

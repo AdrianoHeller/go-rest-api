@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/helpers"
 	"api/models"
 	"api/services"
 	"context"
@@ -32,7 +33,7 @@ func main() {
 
 	fmt.Println("Connected to Postgres")
 
-	guid, err := services.UuidGenerator()
+	guid, err := helpers.UuidGenerator()
 
 	if err != nil {
 		fmt.Printf("Error found while creating uuid: %s", err.Error())

@@ -48,18 +48,18 @@ func InsertUser(conn *pgx.Conn, userData *models.User, tableName string) error {
 	return nil
 }
 
-func CreateWallet(ctx *context.Context, conn *pgx.Conn, owner string) error {
+func CreateWallet(conn *pgx.Conn, owner string) error {
 	uuid, err := helpers.UuidGenerator()
 	if err != nil {
 		errMsg := fmt.Sprintf("Error found: %s", err)
 		return errors.New(errMsg)
 	}
-	newTransaction := models.Wallet{
+	newWallet := models.Wallet{
 		Id:        uuid,
 		Owner:     owner,
 		CreatedAt: int(time.Now().Unix()),
 	}
-	insertNewQuery := fmt.Sprintf("insert into wallets (id,owner,created_at) values('%s','%s','%d')", newTransaction.Id, newTransaction.Owner, newTransaction.CreatedAt)
+	insertNewQuery := fmt.Sprintf("insert into wallets (id,owner,created_at) values('%s','%s','%d')", newWallet.Id, newWallet.Owner, newWallet.CreatedAt)
 	if _, err := conn.Exec(context.Background(), insertNewQuery); err != nil {
 		errMsg := fmt.Sprintf("Error found: %s", err)
 		return errors.New(errMsg)
@@ -67,6 +67,23 @@ func CreateWallet(ctx *context.Context, conn *pgx.Conn, owner string) error {
 	return nil
 }
 
-func CreateTransaction(conn *pgx.Conn, from string, to string, amount int) error {
-
+func CreateTransaction(conn *pgx.Conn, from string, to string, amount float64) error {
+	uuid, err := helpers.UuidGenerator()
+	if err != nil {
+		errMsg := fmt.Sprintf("Error found: %s", err)
+		return errors.New(errMsg)
+	}
+	newTransaction := models.Transaction{
+		Id:     uuid,
+		From:   from,
+		To:     to,
+		Amount: amount,
+		Status: models.Processed,
+	}
+	insertNewQuery := fmt.Sprintf("insert into transactions (id,from,to,amount,status) values('%s','%s','%s','%f','%d')", newTransaction.Id, newTransaction.From, newTransaction.To, newTransaction.Amount, newTransaction.Status)
+	if _, err := conn.Exec(context.Background(), insertNewQuery); err != nil {
+		errMsg := fmt.Sprintf("Error found: %s", err)
+		return errors.New(errMsg)
+	}
+	return nil
 }

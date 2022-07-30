@@ -26,7 +26,7 @@ type Transaction struct {
 type Wallet struct {
 	Id        string `json:"id"`
 	Owner     string `json:"owner"`
-	CreatedAt int    `json:"created_at"`
+	CreatedAt int    `json:"createdAt"`
 }
 
 func (h *Wallet) ServeHTTP(w http.ResponseWriter, r *http.Request) {

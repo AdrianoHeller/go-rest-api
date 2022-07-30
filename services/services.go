@@ -88,8 +88,8 @@ func CreateTransaction(conn *pgx.Conn, from string, to string, amount float64) e
 	return nil
 }
 
-func GetWalletById(conn *pgx.Conn, walletId string) error {
-	composedQuery := fmt.Sprintf("Select * from wallets where Id = '%s'", walletId)
+func GetTransactionById(conn *pgx.Conn, transactionId string) error {
+	composedQuery := fmt.Sprintf("Select * from transactions where Id = '%s'", transactionId)
 	rows, _ := conn.Query(context.Background(), composedQuery)
 	for rows.Next() {
 		var id string
@@ -101,7 +101,23 @@ func GetWalletById(conn *pgx.Conn, walletId string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Wallet: {id:%s,from:%s,to:%s,amount:%f,status:%d", id, from, to, amount, status)
+		fmt.Printf("Transaction: {id:%s,from:%s,to:%s,amount:%f,status:%d", id, from, to, amount, status)
+	}
+	return rows.Err()
+}
+
+func GetWalletById(conn *pgx.Conn, walletId string) error {
+	composedQuery := fmt.Sprintf("Select * from wallets where Id = '%s'", walletId)
+	rows, _ := conn.Query(context.Background(), composedQuery)
+	for rows.Next() {
+		var id string
+		var owner string
+		var createdAt int
+		err := rows.Scan(&id, &owner, &createdAt)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Wallet: {id: %s,owner: %s,created_at: %d}", id, owner, createdAt)
 	}
 	return rows.Err()
 }

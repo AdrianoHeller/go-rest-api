@@ -87,3 +87,21 @@ func CreateTransaction(conn *pgx.Conn, from string, to string, amount float64) e
 	}
 	return nil
 }
+
+func GetWalletById(conn *pgx.Conn, walletId string) error {
+	composedQuery := fmt.Sprintf("Select * from wallets where Id = '%s'", walletId)
+	rows, _ := conn.Query(context.Background(), composedQuery)
+	for rows.Next() {
+		var id string
+		var from string
+		var to string
+		var amount float64
+		var status models.TransStatus
+		err := rows.Scan(&id, &from, &to, &amount, &status)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Wallet: {id:%s,from:%s,to:%s,amount:%f,status:%d", id, from, to, amount, status)
+	}
+	return rows.Err()
+}
